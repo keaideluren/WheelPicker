@@ -1,6 +1,7 @@
 package com.aigestudio.wheelpicker;
 
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 
 import java.util.List;
 
@@ -422,7 +423,7 @@ public interface IWheelPicker {
      *
      * @return 滚轮选择器幕布颜色，16位颜色值
      */
-    int getCurtainColor();
+    Drawable getCurtainDrawable();
 
     /**
      * 设置滚轮选择器幕布颜色
@@ -432,7 +433,7 @@ public interface IWheelPicker {
      *
      * @param color 滚轮选择器幕布颜色，16位颜色值
      */
-    void setCurtainColor(int color);
+    void setCurtainDrawable(Drawable drawable);
 
     /**
      * 设置滚轮选择器是否有空气感

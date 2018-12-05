@@ -1,7 +1,8 @@
 apply plugin: 'com.android.library'
+apply plugin: 'maven'
 android {
     compileSdkVersion 24
-    buildToolsVersion "23.0.3"
+    buildToolsVersion '27.0.3'
 
     defaultConfig {
         minSdkVersion 1
@@ -20,4 +21,22 @@ android {
 }
 dependencies {
     compile 'com.google.code.gson:gson:2.2.4'
+}
+
+uploadArchives { //新增 ，因为Android Studio gradle 支持maven插件，所以可以添加此task
+    configuration = configurations.archives
+    repositories {
+        mavenDeployer {
+            repository(url: 'http://172.16.0.141:8081/nexus/content/repositories/snapshots/') {
+                authentication(userName: 'uoko', password: 'P@ssw0rd')
+            }
+            pom.project {
+                version '1.2-SNAPSHOT' //版本名称
+                artifactId 'android-wheelPicker'  //和前面网站上填写的一样
+                groupId 'com.uoko'  //和前面网站上填写的一样
+                packaging 'aar' //填写aar
+                description 'uploading and selecting images' //更新描述
+            }
+        }
+    }
 }

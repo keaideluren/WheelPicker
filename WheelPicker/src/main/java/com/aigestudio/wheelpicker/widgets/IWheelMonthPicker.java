@@ -10,6 +10,22 @@ package com.aigestudio.wheelpicker.widgets;
  */
 public interface IWheelMonthPicker {
     /**
+     * 月份起止
+     *
+     * @param startMonth
+     * @param endMonth
+     */
+    void setMonthFrame(int startMonth, int endMonth);
+
+    void setMonthStart(int startMonth);
+
+    void setMonthEnd(int endMonth);
+
+    int getMonthStart();
+
+    int getMonthEnd();
+
+    /**
      * 获取月份选择器初始化时选择的月份
      *
      * @return 选择的月份

@@ -71,6 +71,31 @@ public class WheelDayPicker extends WheelPicker implements IWheelDayPicker {
     }
 
     @Override
+    public void setDayFrame(int startDay, int endDay) {
+
+    }
+
+    @Override
+    public void setDayStart(int startDay) {
+
+    }
+
+    @Override
+    public void setDayEnd(int endDay) {
+
+    }
+
+    @Override
+    public int getDayStart() {
+        return 0;
+    }
+
+    @Override
+    public int getDayEnd() {
+        return 0;
+    }
+
+    @Override
     public int getSelectedDay() {
         return mSelectedDay;
     }

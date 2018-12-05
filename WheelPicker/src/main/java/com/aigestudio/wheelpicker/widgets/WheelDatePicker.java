@@ -2,6 +2,7 @@ package com.aigestudio.wheelpicker.widgets;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
@@ -23,6 +24,7 @@ public class WheelDatePicker extends LinearLayout implements WheelPicker.OnItemS
         IWheelDayPicker {
     private static final SimpleDateFormat SDF =
             new SimpleDateFormat("yyyy-M-d", Locale.getDefault());
+    private Date startDate = new Date(1000, 0, 1), endDate = new Date(3000, 0, 1);
 
     private WheelYearPicker mPickerYear;
     private WheelMonthPicker mPickerMonth;
@@ -70,6 +72,12 @@ public class WheelDatePicker extends LinearLayout implements WheelPicker.OnItemS
         for (int i = 0; i < lastYear.length(); i++)
             sb.append("0");
         mPickerYear.setMaximumWidthText(sb.toString());
+    }
+
+    public void setDateFrame(Date startDate, Date endDate) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+        setYearFrame(startDate.getYear(),endDate.getYear());
     }
 
     @Override
@@ -308,9 +316,9 @@ public class WheelDatePicker extends LinearLayout implements WheelPicker.OnItemS
 
     @Override
     public int getIndicatorColor() {
-        if (mPickerYear.getCurtainColor() == mPickerMonth.getCurtainColor() &&
-                mPickerMonth.getCurtainColor() == mPickerDay.getCurtainColor())
-            return mPickerYear.getCurtainColor();
+        if (mPickerYear.getIndicatorColor() == mPickerMonth.getIndicatorColor() &&
+                mPickerMonth.getIndicatorColor() == mPickerDay.getIndicatorColor())
+            return mPickerYear.getIndicatorColor();
         throw new RuntimeException("Can not get indicator color correctly from WheelDatePicker!");
     }
 
@@ -335,18 +343,18 @@ public class WheelDatePicker extends LinearLayout implements WheelPicker.OnItemS
     }
 
     @Override
-    public int getCurtainColor() {
-        if (mPickerYear.getCurtainColor() == mPickerMonth.getCurtainColor() &&
-                mPickerMonth.getCurtainColor() == mPickerDay.getCurtainColor())
-            return mPickerYear.getCurtainColor();
+    public Drawable getCurtainDrawable() {
+        if (mPickerYear.getCurtainDrawable() == mPickerMonth.getCurtainDrawable() &&
+                mPickerMonth.getCurtainDrawable() == mPickerDay.getCurtainDrawable())
+            return mPickerYear.getCurtainDrawable();
         throw new RuntimeException("Can not get curtain color correctly from WheelDatePicker!");
     }
 
     @Override
-    public void setCurtainColor(int color) {
-        mPickerYear.setCurtainColor(color);
-        mPickerMonth.setCurtainColor(color);
-        mPickerDay.setCurtainColor(color);
+    public void setCurtainDrawable(Drawable drawable) {
+        mPickerYear.setCurtainDrawable(drawable);
+        mPickerMonth.setCurtainDrawable(drawable);
+        mPickerDay.setCurtainDrawable(drawable);
     }
 
     @Override
@@ -521,6 +529,31 @@ public class WheelDatePicker extends LinearLayout implements WheelPicker.OnItemS
     }
 
     @Override
+    public void setMonthFrame(int startMonth, int endMonth) {
+        mPickerMonth.setMonthFrame(startMonth, endMonth);
+    }
+
+    @Override
+    public void setMonthStart(int startMonth) {
+        mPickerMonth.setMonthStart(startMonth);
+    }
+
+    @Override
+    public void setMonthEnd(int endMonth) {
+        mPickerMonth.setMonthEnd(endMonth);
+    }
+
+    @Override
+    public int getMonthStart() {
+        return mPickerMonth.getMonthStart();
+    }
+
+    @Override
+    public int getMonthEnd() {
+        return mPickerMonth.getMonthEnd();
+    }
+
+    @Override
     public int getSelectedMonth() {
         return mPickerMonth.getSelectedMonth();
     }
@@ -535,6 +568,31 @@ public class WheelDatePicker extends LinearLayout implements WheelPicker.OnItemS
     @Override
     public int getCurrentMonth() {
         return mPickerMonth.getCurrentMonth();
+    }
+
+    @Override
+    public void setDayFrame(int startDay, int endDay) {
+        mPickerDay.setDayFrame(startDay, endDay);
+    }
+
+    @Override
+    public void setDayStart(int startDay) {
+        mPickerDay.setDayStart(startDay);
+    }
+
+    @Override
+    public void setDayEnd(int endDay) {
+        mPickerDay.setDayEnd(endDay);
+    }
+
+    @Override
+    public int getDayStart() {
+        return mPickerDay.getDayStart();
+    }
+
+    @Override
+    public int getDayEnd() {
+        return mPickerDay.getDayEnd();
     }
 
     @Override

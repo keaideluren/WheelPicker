@@ -10,6 +10,20 @@ package com.aigestudio.wheelpicker.widgets;
  */
 public interface IWheelDayPicker {
     /**
+     * 日期起止
+     *
+     */
+    void setDayFrame(int startDay, int endDay);
+
+    void setDayStart(int startDay);
+
+    void setDayEnd(int endDay);
+
+    int getDayStart();
+
+    int getDayEnd();
+
+    /**
      * 获取日期选择器初始化时选择的日期
      *
      * @return 选择的日期

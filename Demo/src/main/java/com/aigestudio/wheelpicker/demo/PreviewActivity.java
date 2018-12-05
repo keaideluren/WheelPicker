@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.aigestudio.wheelpicker.WheelPicker;
+import com.aigestudio.wheelpicker.widgets.WheelDatePicker;
 
 /**
  * @author AigeStudio 2015-12-06
@@ -36,6 +37,12 @@ public class PreviewActivity extends Activity implements WheelPicker.OnItemSelec
         gotoBtn = (Button) findViewById(R.id.goto_btn);
         randomlySetGotoBtnIndex();
         gotoBtn.setOnClickListener(this);
+
+        WheelDatePicker d = (WheelDatePicker) findViewById(R.id.date);
+        d.setSelectedYear(2018);
+        d.setYearFrame(2012,2038);
+        d.setSelectedYear(2018);
+        Toast.makeText(this, d.getCurrentDate().getYear() + "", Toast.LENGTH_SHORT).show();
     }
 
     private void randomlySetGotoBtnIndex() {

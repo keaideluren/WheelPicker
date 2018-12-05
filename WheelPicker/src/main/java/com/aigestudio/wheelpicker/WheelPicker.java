@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Region;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
 import android.text.TextUtils;
@@ -30,9 +31,9 @@ import java.util.List;
  *
  * @author AigeStudio 2015-12-12
  * @author AigeStudio 2016-06-17
- *         更新项目结构
- *         <p>
- *         New project structure
+ * 更新项目结构
+ * <p>
+ * New project structure
  * @version 1.1.0
  */
 public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable {
@@ -140,9 +141,9 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
     /**
      * 幕布颜色
      *
-     * @see #setCurtainColor(int)
+     * @see #setCurtainDrawable(Drawable)
      */
-    private int mCurtainColor;
+    private Drawable mCurtainDrawable;
 
     /**
      * 数据项之间间距
@@ -316,7 +317,7 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
         mIndicatorSize = a.getDimensionPixelSize(R.styleable.WheelPicker_wheel_indicator_size,
                 getResources().getDimensionPixelSize(R.dimen.WheelIndicatorSize));
         hasCurtain = a.getBoolean(R.styleable.WheelPicker_wheel_curtain, false);
-        mCurtainColor = a.getColor(R.styleable.WheelPicker_wheel_curtain_color, 0x88FFFFFF);
+        mCurtainDrawable = a.getDrawable(R.styleable.WheelPicker_wheel_curtain_drawable);
         hasAtmospheric = a.getBoolean(R.styleable.WheelPicker_wheel_atmospheric, false);
         isCurved = a.getBoolean(R.styleable.WheelPicker_wheel_curved, false);
         mItemAlign = a.getInt(R.styleable.WheelPicker_wheel_item_align, ALIGN_CENTER);
@@ -452,8 +453,11 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
             realSize = sizeExpect;
         } else {
             realSize = sizeActual;
-            if (mode == MeasureSpec.AT_MOST)
+            if (mode == MeasureSpec.AT_MOST) {
                 realSize = Math.min(realSize, sizeExpect);
+            } else if (mode == MeasureSpec.UNSPECIFIED) {
+                realSize = Math.max(realSize, sizeExpect);
+            }
         }
         return realSize;
     }
@@ -653,10 +657,9 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
         }
         // 是否需要绘制幕布
         // Need to draw curtain or not
-        if (hasCurtain) {
-            mPaint.setColor(mCurtainColor);
-            mPaint.setStyle(Paint.Style.FILL);
-            canvas.drawRect(mRectCurrentItem, mPaint);
+        if (hasCurtain && mCurtainDrawable != null) {
+            mCurtainDrawable.setBounds(mRectCurrentItem);
+            mCurtainDrawable.draw(canvas);
         }
         // 是否需要绘制指示器
         // Need to draw indicator or not
@@ -853,29 +856,29 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
     }
 
     public void setSelectedItemPosition(int position, final boolean animated) {
-      isTouchTriggered = false;
-      if (animated && mScroller.isFinished()) { // We go non-animated regardless of "animated" parameter if scroller is in motion
-        int length = getData().size();
-        int itemDifference = position - mCurrentItemPosition;
-        if (itemDifference == 0)
-          return;
-        if (isCyclic && Math.abs(itemDifference) > (length / 2)) { // Find the shortest path if it's cyclic
-          itemDifference += (itemDifference > 0) ? -length : length;
+        isTouchTriggered = false;
+        if (animated && mScroller.isFinished()) { // We go non-animated regardless of "animated" parameter if scroller is in motion
+            int length = getData().size();
+            int itemDifference = position - mCurrentItemPosition;
+            if (itemDifference == 0)
+                return;
+            if (isCyclic && Math.abs(itemDifference) > (length / 2)) { // Find the shortest path if it's cyclic
+                itemDifference += (itemDifference > 0) ? -length : length;
+            }
+            mScroller.startScroll(0, mScroller.getCurrY(), 0, (-itemDifference) * mItemHeight);
+            mHandler.post(this);
+        } else {
+            if (!mScroller.isFinished())
+                mScroller.abortAnimation();
+            position = Math.min(position, mData.size() - 1);
+            position = Math.max(position, 0);
+            mSelectedItemPosition = position;
+            mCurrentItemPosition = position;
+            mScrollOffsetY = 0;
+            computeFlingLimitY();
+            requestLayout();
+            invalidate();
         }
-        mScroller.startScroll(0, mScroller.getCurrY(), 0, (-itemDifference) * mItemHeight);
-        mHandler.post(this);
-      } else {
-        if (!mScroller.isFinished())
-          mScroller.abortAnimation();
-        position = Math.min(position, mData.size() - 1);
-        position = Math.max(position, 0);
-        mSelectedItemPosition = position;
-        mCurrentItemPosition = position;
-        mScrollOffsetY = 0;
-        computeFlingLimitY();
-        requestLayout();
-        invalidate();
-      }
     }
 
     @Override
@@ -1052,13 +1055,13 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
     }
 
     @Override
-    public int getCurtainColor() {
-        return mCurtainColor;
+    public Drawable getCurtainDrawable() {
+        return mCurtainDrawable;
     }
 
     @Override
-    public void setCurtainColor(int color) {
-        mCurtainColor = color;
+    public void setCurtainDrawable(Drawable drawable) {
+        mCurtainDrawable = drawable;
         invalidate();
     }
 
@@ -1118,7 +1121,7 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
      * 滚轮选择器Item项被选中时监听接口
      *
      * @author AigeStudio 2016-06-17
-     *         新项目结构
+     * 新项目结构
      * @version 1.1.0
      */
     public interface OnItemSelectedListener {
@@ -1137,9 +1140,9 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
      * 滚轮选择器滚动时监听接口
      *
      * @author AigeStudio 2016-06-17
-     *         新项目结构
-     *         <p>
-     *         New project structure
+     * 新项目结构
+     * <p>
+     * New project structure
      * @since 2016-06-17
      */
     public interface OnWheelChangeListener {
