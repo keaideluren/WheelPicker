@@ -6,8 +6,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.aigestudio.wheelpicker.IWheelDataTransformer;
 import com.aigestudio.wheelpicker.WheelPicker;
 import com.aigestudio.wheelpicker.widgets.WheelDatePicker;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author AigeStudio 2015-12-06
@@ -38,10 +43,19 @@ public class PreviewActivity extends Activity implements WheelPicker.OnItemSelec
         randomlySetGotoBtnIndex();
         gotoBtn.setOnClickListener(this);
 
+        List<Integer> list = new ArrayList<Integer>();
+        for (int i = 0; i < 10; i++) {
+            list.add(i);
+        }
+        wheelLeft.setData(list, new IWheelDataTransformer<Integer>() {
+            @Override
+            public String transform(Integer data) {
+                return "第" + data.toString() + "项";
+            }
+        });
+
         WheelDatePicker d = (WheelDatePicker) findViewById(R.id.date);
-        d.setSelectedYear(2018);
-        d.setYearFrame(2012,2038);
-        d.setSelectedYear(2018);
+        d.setDateFrame(new Date(), new Date(122, 2, 15));
         Toast.makeText(this, d.getCurrentDate().getYear() + "", Toast.LENGTH_SHORT).show();
     }
 

@@ -431,7 +431,7 @@ public interface IWheelPicker {
      * Set color of curtain
      * For example 0xFF123456
      *
-     * @param color 滚轮选择器幕布颜色，16位颜色值
+     * @param drawable 滚轮选择器幕布颜色，16位颜色值
      */
     void setCurtainDrawable(Drawable drawable);
 

@@ -26,6 +26,7 @@ public class WheelDayPicker extends WheelPicker implements IWheelDayPicker {
 
     private int mYear, mMonth;
     private int mSelectedDay;
+    private int startDay = 1, endDay = 31;
 
     public WheelDayPicker(Context context) {
         this(context, null);
@@ -51,18 +52,16 @@ public class WheelDayPicker extends WheelPicker implements IWheelDayPicker {
         mCalendar.set(Calendar.MONTH, mMonth);
 
         int days = mCalendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-        List<Integer> data = DAYS.get(days);
-        if (null == data) {
-            data = new ArrayList<>();
-            for (int i = 1; i <= days; i++)
-                data.add(i);
-            DAYS.put(days, data);
+        ArrayList<Integer> data = new ArrayList<>();
+        for (int i = Math.max(1, startDay); i <= Math.min(days, endDay); i++) {
+            data.add(i);
         }
+
         super.setData(data);
     }
 
     private void updateSelectedDay() {
-        setSelectedItemPosition(mSelectedDay - 1);
+        setSelectedItemPosition(mSelectedDay - Math.max(1, startDay));
     }
 
     @Override
@@ -72,27 +71,41 @@ public class WheelDayPicker extends WheelPicker implements IWheelDayPicker {
 
     @Override
     public void setDayFrame(int startDay, int endDay) {
+        this.startDay = startDay;
+        this.endDay = endDay;
+        if (mSelectedDay > endDay) {
+            mSelectedDay = endDay;
+        } else if (mSelectedDay < startDay) {
+            mSelectedDay = startDay;
+        }
+    }
 
+    public void setmSelectedDay(int selectedDay) {
+        if (mSelectedDay > endDay) {
+            mSelectedDay = endDay;
+        } else if (mSelectedDay < startDay) {
+            mSelectedDay = startDay;
+        }
     }
 
     @Override
     public void setDayStart(int startDay) {
-
+        this.startDay = startDay;
     }
 
     @Override
     public void setDayEnd(int endDay) {
-
+        this.endDay = endDay;
     }
 
     @Override
     public int getDayStart() {
-        return 0;
+        return startDay;
     }
 
     @Override
     public int getDayEnd() {
-        return 0;
+        return endDay;
     }
 
     @Override
@@ -102,7 +115,13 @@ public class WheelDayPicker extends WheelPicker implements IWheelDayPicker {
 
     @Override
     public void setSelectedDay(int day) {
-        mSelectedDay = day;
+        if (day > endDay) {
+            mSelectedDay = endDay;
+        } else if (day < startDay) {
+            mSelectedDay = startDay;
+        } else {
+            mSelectedDay = day;
+        }
         updateSelectedDay();
     }
 

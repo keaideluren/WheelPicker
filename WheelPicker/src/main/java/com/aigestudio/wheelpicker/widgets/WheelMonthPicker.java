@@ -19,6 +19,8 @@ import java.util.List;
  */
 public class WheelMonthPicker extends WheelPicker implements IWheelMonthPicker {
     private int mSelectedMonth;
+    private int mMonthStart = 1;
+    private int mMonthEnd = 12;
 
     public WheelMonthPicker(Context context) {
         this(context, null);
@@ -28,21 +30,56 @@ public class WheelMonthPicker extends WheelPicker implements IWheelMonthPicker {
         super(context, attrs);
 
         List<Integer> data = new ArrayList<>();
-        for (int i = 1; i <= 12; i++)
+        for (int i = Math.max(1, mMonthStart); i <= Math.min(12, mMonthEnd); i++)
             data.add(i);
         super.setData(data);
 
         mSelectedMonth = Calendar.getInstance().get(Calendar.MONTH) + 1;
-        updateSelectedYear();
+        updateSelectedMonth();
     }
 
-    private void updateSelectedYear() {
-        setSelectedItemPosition(mSelectedMonth - 1);
+    public void  updateSelectedMonth() {
+        setSelectedItemPosition(mSelectedMonth - Math.max(1, mMonthStart));
     }
 
     @Override
     public void setData(List data) {
         throw new UnsupportedOperationException("You can not invoke setData in WheelMonthPicker");
+    }
+
+    @Override
+    public void setMonthFrame(int startMonth, int endMonth) {
+        this.mMonthStart = startMonth;
+        this.mMonthEnd = endMonth;
+        if (mSelectedMonth > endMonth) {
+            mSelectedMonth = endMonth;
+        } else if (mSelectedMonth < startMonth) {
+            mSelectedMonth = startMonth;
+        }
+        List<Integer> data = new ArrayList<>();
+        for (int i = startMonth; i <= endMonth; i++)
+            data.add(i);
+        super.setData(data);
+    }
+
+    @Override
+    public void setMonthStart(int startMonth) {
+        this.mMonthStart = startMonth;
+    }
+
+    @Override
+    public void setMonthEnd(int endMonth) {
+        this.mMonthEnd = endMonth;
+    }
+
+    @Override
+    public int getMonthStart() {
+        return mMonthStart;
+    }
+
+    @Override
+    public int getMonthEnd() {
+        return mMonthEnd;
     }
 
     @Override
@@ -52,12 +89,22 @@ public class WheelMonthPicker extends WheelPicker implements IWheelMonthPicker {
 
     @Override
     public void setSelectedMonth(int month) {
-        mSelectedMonth = month;
-        updateSelectedYear();
+        if (month > mMonthEnd) {
+            mSelectedMonth = mMonthEnd;
+        } else if (month < mMonthStart) {
+            mSelectedMonth = mMonthStart;
+        } else {
+            mSelectedMonth = month;
+        }
+        updateSelectedMonth();
     }
 
     @Override
     public int getCurrentMonth() {
         return Integer.valueOf(String.valueOf(getData().get(getCurrentItemPosition())));
+    }
+
+    public int getmSelectedMonth() {
+        return mSelectedMonth;
     }
 }

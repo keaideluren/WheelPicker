@@ -77,7 +77,19 @@ public class WheelDatePicker extends LinearLayout implements WheelPicker.OnItemS
     public void setDateFrame(Date startDate, Date endDate) {
         this.startDate = startDate;
         this.endDate = endDate;
-        setYearFrame(startDate.getYear(),endDate.getYear());
+        setYearFrame(startDate.getYear() + 1900, endDate.getYear() + 1900);
+        Date today = new Date();
+        if (today.getTime() >= startDate.getTime() && today.getTime() <= endDate.getTime()) {
+            setSelectedYear(today.getYear() + 1900);
+            if (today.getYear() == startDate.getYear() || today.getYear() == endDate.getYear()) {
+                onItemSelected(mPickerYear, mYear, 0);
+            }
+
+        } else {
+            setSelectedYear(startDate.getYear() + 1900);
+            setSelectedYear(today.getMonth() + 1);
+            setSelectedYear(today.getDate());
+        }
     }
 
     @Override
@@ -85,11 +97,74 @@ public class WheelDatePicker extends LinearLayout implements WheelPicker.OnItemS
         if (picker.getId() == R.id.wheel_date_picker_year) {
             mYear = (int) data;
             mPickerDay.setYear(mYear);
+            if (mYear <= getYearStart()) {
+                //最开始的时间
+                mPickerMonth.setMonthFrame(startDate.getMonth() + 1, 12);
+                if (mMonth <= startDate.getMonth() + 1) {
+                    mMonth = startDate.getMonth() + 1;
+//                    mPickerMonth.setSelectedMonth(mMonth);
+                    mPickerDay.setDayFrame(startDate.getDate(), 31);
+                    if (mDay < startDate.getDate()) {
+                        mDay = startDate.getDate();
+//                        mPickerDay.setSelectedDay(startDate.getDate());
+                    }
+                    mPickerDay.setMonth(mMonth);
+                }
+            } else if (mYear >= getYearEnd()) {
+                //最后的时间
+                if (mMonth >= endDate.getMonth() + 1) {
+                    mMonth = endDate.getMonth() + 1;
+//                    mPickerMonth.setSelectedMonth(mMonth);
+                    mPickerDay.setDayFrame(1, endDate.getDate());
+                    if (mDay > endDate.getDate()) {
+                        mDay = endDate.getDate();
+//                        mPickerDay.setSelectedDay(endDate.getDate());
+                    }
+                    mPickerDay.setMonth(mMonth);
+                }
+                mPickerMonth.setMonthFrame(1, endDate.getMonth() + 1);
+
+            } else {
+//                mPickerMonth.setSelectedMonth(mMonth);
+                mPickerMonth.setMonthFrame(1, 12);
+                mPickerDay.setDayFrame(1, 31);
+                mPickerDay.setMonth(mPickerMonth.getCurrentMonth());
+            }
         } else if (picker.getId() == R.id.wheel_date_picker_month) {
             mMonth = (int) data;
+            if (mYear <= getYearStart()) {
+                //最开始的时间
+                if (mMonth <= startDate.getMonth() + 1) {
+                    mMonth = startDate.getMonth() + 1;
+                    mPickerMonth.setSelectedMonth(mMonth);
+                    mPickerDay.setDayFrame(startDate.getDate(), 31);
+                    if (mDay < startDate.getDate()) {
+                        mDay = startDate.getDate();
+//                        mPickerDay.setSelectedDay(startDate.getDate());
+                    }
+                } else {
+                    mPickerDay.setDayFrame(1, 31);
+                }
+            } else if (mYear >= getYearEnd()) {
+                //最后的时间
+                if (mMonth >= endDate.getMonth() + 1) {
+                    mMonth = endDate.getMonth() + 1;
+                    mPickerMonth.setSelectedMonth(mMonth);
+                    mPickerDay.setDayFrame(1, endDate.getDate());
+                    if (mDay > endDate.getDate()) {
+                        mDay = endDate.getDate();
+//                        mPickerDay.setSelectedDay(endDate.getDate());
+                    }
+                } else {
+                    mPickerDay.setDayFrame(1, 31);
+                }
+            } else {
+                mPickerDay.setDayFrame(1, 31);
+            }
             mPickerDay.setMonth(mMonth);
         }
         mDay = mPickerDay.getCurrentDay();
+
         String date = mYear + "-" + mMonth + "-" + mDay;
         if (null != mListener) try {
             mListener.onDateSelected(this, SDF.parse(date));

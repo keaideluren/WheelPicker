@@ -7,7 +7,7 @@
     android:gravity="center"
     android:orientation="horizontal">
 
-    <com.aigestudio.wheelpicker.WheelPicker
+    <com.aigestudio.wheelpicker.widgets.WheelDatePicker
         android:id="@+id/main_wheel_left"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

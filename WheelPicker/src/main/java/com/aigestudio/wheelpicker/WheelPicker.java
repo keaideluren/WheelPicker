@@ -287,6 +287,8 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
 
     private boolean isDebug;
 
+    private IWheelDataTransformer transformer;
+
     public WheelPicker(Context context) {
         this(context, null);
     }
@@ -380,16 +382,32 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
     private void computeTextSize() {
         mTextMaxWidth = mTextMaxHeight = 0;
         if (hasSameWidth) {
-            mTextMaxWidth = (int) mPaint.measureText(String.valueOf(mData.get(0)));
+            String showString = null;
+            if (transformer == null) {
+                showString = String.valueOf(mData.get(0));
+            } else {
+                showString = transformer.transform(mData.get(0));
+            }
+            mTextMaxWidth = (int) mPaint.measureText(showString);
         } else if (isPosInRang(mTextMaxWidthPosition)) {
-            mTextMaxWidth = (int) mPaint.measureText
-                    (String.valueOf(mData.get(mTextMaxWidthPosition)));
+            String showString = null;
+            if (transformer == null) {
+                showString = String.valueOf(mData.get(mTextMaxWidthPosition));
+            } else {
+                showString = transformer.transform(mData.get(mTextMaxWidthPosition));
+            }
+            mTextMaxWidth = (int) mPaint.measureText(showString);
         } else if (!TextUtils.isEmpty(mMaxWidthText)) {
             mTextMaxWidth = (int) mPaint.measureText(mMaxWidthText);
         } else {
             for (Object obj : mData) {
-                String text = String.valueOf(obj);
-                int width = (int) mPaint.measureText(text);
+                String showString = null;
+                if (transformer == null) {
+                    showString = String.valueOf(obj);
+                } else {
+                    showString = transformer.transform(obj);
+                }
+                int width = (int) mPaint.measureText(showString);
                 mTextMaxWidth = Math.max(mTextMaxWidth, width);
             }
         }
@@ -552,10 +570,19 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
             if (isCyclic) {
                 int actualPos = drawnDataPos % mData.size();
                 actualPos = actualPos < 0 ? (actualPos + mData.size()) : actualPos;
-                data = String.valueOf(mData.get(actualPos));
+                if (transformer == null) {
+                    data = String.valueOf(mData.get(actualPos));
+                } else {
+                    data = transformer.transform(mData.get(actualPos));
+                }
             } else {
-                if (isPosInRang(drawnDataPos))
-                    data = String.valueOf(mData.get(drawnDataPos));
+                if (isPosInRang(drawnDataPos)){
+                    if (transformer == null) {
+                        data = String.valueOf(mData.get(drawnDataPos));
+                    } else {
+                        data = transformer.transform(mData.get(drawnDataPos));
+                    }
+                }
             }
             mPaint.setColor(mItemTextColor);
             mPaint.setStyle(Paint.Style.FILL);
@@ -908,6 +935,11 @@ public class WheelPicker extends View implements IDebug, IWheelPicker, Runnable 
         computeFlingLimitY();
         requestLayout();
         invalidate();
+    }
+
+    public <T> void setData(List<T> data, IWheelDataTransformer<T> transformer) {
+        this.transformer = transformer;
+        setData(data);
     }
 
     public void setSameWidth(boolean hasSameWidth) {
